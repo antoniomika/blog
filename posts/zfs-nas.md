@@ -761,4 +761,9 @@ There are tools available that can help with setting up syncing and replicating 
 which is why I chose to role things on my own. This guide is to serve as an aide when it comes to choosing what is best
 for yourself and your data.
 
+It's also important to note that ZFS native encryption is plagued by some pretty nasty bugs when it comes to snapshots
+(particularly when using `raw` for snapshot send/receive). They don't always happen and are difficult to reproduce,
+but you should [consult the evidence](https://github.com/openzfs/zfs/issues?q=is%3Aopen+is%3Aissue+label%3A%22Component%3A+Encryption%22)
+that's out there when making your decision on what method you want to use.
+
 If you have any questions or comments, feel free to shoot me an [email](mailto:me@antoniomika.me) or message me on [IRC](https://web.libera.chat/#pico.sh). 
