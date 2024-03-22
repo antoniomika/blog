@@ -1,0 +1,44 @@
+.md h1 {
+	font-size: 2rem !important;
+}
+
+.md h2 {
+	font-size: 1.75rem !important;
+}
+
+.md h3 {
+	font-size: 1.5rem !important;
+}
+
+.md h4 {
+	font-size: 1.25rem !important;
+}
+
+.md h5 {
+	font-size: 1rem !important;
+	padding: 0;
+	margin: 1.5rem 0 0.9rem 0;
+	font-weight: bold;
+	color: var(--white-dark);
+}
+
+.md h5 a {
+	color: var(--grey-light);
+	text-decoration: none;
+}
+
+:root {
+	--body-max-width: 40%;
+}
+
+@media screen and (max-width: 60em) {
+	:root {
+		--body-max-width: 80%;
+	}
+}
+
+@media screen and (max-width: 40em) {
+	:root {
+		--body-max-width: 100%;
+	}
+}
