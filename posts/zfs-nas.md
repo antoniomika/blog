@@ -738,15 +738,15 @@ This compose file lives in `/backup/misc/monitoring`, so it is also retained as 
 
 Here are some graphs from Grafana:
 
-<img src="zfs-nas-smart-1.png" style="max-width: 100%;" />
+<img src="/zfs-nas-smart-1.png" style="max-width: 100%;" />
 <br/>
-<img src="zfs-nas-smart-2.png" style="max-width: 100%;" />
+<img src="/zfs-nas-smart-2.png" style="max-width: 100%;" />
 <br/>
-<img src="zfs-nas-smart-3.png" style="max-width: 100%;" />
+<img src="/zfs-nas-smart-3.png" style="max-width: 100%;" />
 <br/>
-<img src="zfs-nas-docker-1.png" style="max-width: 100%;" />
+<img src="/zfs-nas-docker-1.png" style="max-width: 100%;" />
 <br/>
-<img src="zfs-nas-docker-2.png" style="max-width: 100%;" />
+<img src="/zfs-nas-docker-2.png" style="max-width: 100%;" />
 <br/>
 
 ## Networking
