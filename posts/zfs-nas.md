@@ -27,8 +27,8 @@ fairly reliable.
 ## It's as easy as 3-2-1
 
 When architecting my new backup strategy, I decided it was time for an upgrade. Generally, the 3-2-1
-data backup method is recommended. The idea with this strategy is you maintain *3* different copies of
-your data, with *2* copies stored in two different locations/media, and *1* copy stored at an offsite location.
+data backup method is recommended. The idea with this strategy is you maintain _3_ different copies of
+your data, with _2_ copies stored in two different locations/media, and _1_ copy stored at an offsite location.
 This setup is pretty easy to achieve and provides pretty good fault-tolerance and disaster recovery.
 It also ensures that your data is protected when the unthinkable happens.
 
@@ -75,7 +75,7 @@ Primary data sources would be backed up using the following:
 - [rsync](https://rsync.samba.org/) for random hosts/data that don't need dedupe and other Borg niceties
 - [samba](https://www.samba.org/) for macOS/Windows
 
-The backup targets would be machines running *Ubuntu Server 22.04 LTS*. All backup data would be stored in *ZFS*,
+The backup targets would be machines running _Ubuntu Server 22.04 LTS_. All backup data would be stored in _ZFS_,
 which would ultimately make our desired scheme trivial to implement. They would have the following configuration:
 
 - 32gb of ram
@@ -87,7 +87,7 @@ For the base OS, the default installation parameters were chosen. Regarding the 
 a zpool was created that consisted of two mirrored vdevs, with each mirror containing 2 disks. This strategy provides decent
 redundancy in the case that a disk fails (we can lose up to one disk in each vdev), while also allowing us to grow the pool in
 the future. If the pool is ever running low on data, we can easily add another vdev of 2 disks to increase the capacity. This
-method does result in our storage pool having capacity of half the total disk space we have available (18tb * 2 vdevs = 36tb).
+method does result in our storage pool having capacity of half the total disk space we have available (18tb \* 2 vdevs = 36tb).
 
 Over using zraid, this option gives us fantastic performance, good scalability, and ease of management.
 
@@ -104,91 +104,91 @@ The setup process for each NAS was pretty much the same and can be summarized by
 
 1. Install ZFS on Linux and setup the zpool named `backup`:
 
-  ```bash
-  # Install ZoL
-  apt-get update && apt-get install zfsutils-linux -y
+```bash
+# Install ZoL
+apt-get update && apt-get install zfsutils-linux -y
 
-  # Get the list of devices by their ids to ensure
-  # they are found correctly when the pool is imported:
-  ls /dev/disk/by-id/*
+# Get the list of devices by their ids to ensure
+# they are found correctly when the pool is imported:
+ls /dev/disk/by-id/*
 
-  # Create the mirrored pool with the first vdev
-  zpool create -o ashift={ashift} backup mirror \
-    /dev/disk/by-id/{device_id_here} \
-    /dev/disk/by-id/{device_id_here}
+# Create the mirrored pool with the first vdev
+zpool create -o ashift={ashift} backup mirror \
+  /dev/disk/by-id/{device_id_here} \
+  /dev/disk/by-id/{device_id_here}
 
-  # Add another vdev to the pool (can be done as many times as we want, expanding the pool)
-  zpool add -o ashift={ashift} backup mirror \
-    /dev/disk/by-id/{device_id_here} \
-    /dev/disk/by-id/{device_id_here}
+# Add another vdev to the pool (can be done as many times as we want, expanding the pool)
+zpool add -o ashift={ashift} backup mirror \
+  /dev/disk/by-id/{device_id_here} \
+  /dev/disk/by-id/{device_id_here}
 
-  # Enable compression for the pool (if desired)
-  zfs set compression=on backup
+# Enable compression for the pool (if desired)
+zfs set compression=on backup
 
-  # Disable mounting for the pool (if desired)
-  zfs set canmount=off backup
-  ```
+# Disable mounting for the pool (if desired)
+zfs set canmount=off backup
+```
 
-  > ***NOTE:*** I decided to use `compression=on`, but you can tune this to your own preferences.
-  > I also decided not to encrypt the entire zpool, so I could control this per-dataset (and therefore),
-  > have different encryption keys per dataset. You should modify these snippets how you want (including)
-  > changing variables to what you want them to be.
+> **_NOTE:_** I decided to use `compression=on`, but you can tune this to your own preferences.
+> I also decided not to encrypt the entire zpool, so I could control this per-dataset (and therefore),
+> have different encryption keys per dataset. You should modify these snippets how you want (including)
+> changing variables to what you want them to be.
 
 1. Setup the different datasets you want:
 
-  ```bash
-  # Create an encrypted dataset for borg
-  zfs create -o encryption=aes-256-gcm \
-    -o keylocation=prompt \
-    -o keyformat=passphrase \
-    backup/borg
+```bash
+# Create an encrypted dataset for borg
+zfs create -o encryption=aes-256-gcm \
+  -o keylocation=prompt \
+  -o keyformat=passphrase \
+  backup/borg
 
-  # Create an encrypted dataset for misc
-  zfs create -o encryption=aes-256-gcm \
-    -o keylocation=prompt \
-    -o keyformat=passphrase \
-    backup/misc
+# Create an encrypted dataset for misc
+zfs create -o encryption=aes-256-gcm \
+  -o keylocation=prompt \
+  -o keyformat=passphrase \
+  backup/misc
 
-  # Setup a dataset for samba with some settings we need
-  # We disable access times, inherit acls, disable unneeded
-  # permissions, and set extended attributes to be stored more
-  # optimally for performance. I also set a quota for samba
-  # and the descendant data sets to 5T.
-  # The quota can also be changed later or switched to `refquota`
-  # which does not include snapshot sizes.
-  zfs create -o encryption=aes-256-gcm
-    -o keylocation=prompt
-    -o keyformat=passphrase
-    -o atime=off \
-    -o dnodesize=auto \
-    -o aclinherit=passthrough \
-    -o acltype=posixacl \
-    -o xattr=sa \
-    -o exec=off \
-    -o devices=off \
-    -o setuid=off \
-    -o canmount=on \
-    -o quota=5T \
-    backup/samba
+# Setup a dataset for samba with some settings we need
+# We disable access times, inherit acls, disable unneeded
+# permissions, and set extended attributes to be stored more
+# optimally for performance. I also set a quota for samba
+# and the descendant data sets to 5T.
+# The quota can also be changed later or switched to `refquota`
+# which does not include snapshot sizes.
+zfs create -o encryption=aes-256-gcm
+  -o keylocation=prompt
+  -o keyformat=passphrase
+  -o atime=off \
+  -o dnodesize=auto \
+  -o aclinherit=passthrough \
+  -o acltype=posixacl \
+  -o xattr=sa \
+  -o exec=off \
+  -o devices=off \
+  -o setuid=off \
+  -o canmount=on \
+  -o quota=5T \
+  backup/samba
 
-  # Setup a dataset for windows and inherit the samba configs
-  # (but set a different encryption key)
-  zfs create -o encryption=aes-256-gcm \
-    -o keylocation=prompt \
-    -o keyformat=passphrase backup/samba/windows
+# Setup a dataset for windows and inherit the samba configs
+# (but set a different encryption key)
+zfs create -o encryption=aes-256-gcm \
+  -o keylocation=prompt \
+  -o keyformat=passphrase backup/samba/windows
 
-  # Setup a dataset for macos and inherit the samba configs
-  # (but set a different encryption key)
-  zfs create -o encryption=aes-256-gcm \
-    -o keylocation=prompt \
-    -o keyformat=passphrase backup/samba/macos
+# Setup a dataset for macos and inherit the samba configs
+# (but set a different encryption key)
+zfs create -o encryption=aes-256-gcm \
+  -o keylocation=prompt \
+  -o keyformat=passphrase backup/samba/macos
 
-  # Setup a dataset for public use and inherit the samba configs
-  # (but set a different encryption key)
-  zfs create -o encryption=aes-256-gcm \
-    -o keylocation=prompt \
-    -o keyformat=passphrase backup/samba/public
-  ```
+# Setup a dataset for public use and inherit the samba configs
+# (but set a different encryption key)
+zfs create -o encryption=aes-256-gcm \
+  -o keylocation=prompt \
+  -o keyformat=passphrase backup/samba/public
+```
 
 After running the above, we can see the status of our pool:
 
@@ -243,7 +243,7 @@ that any software I run on this host will continue to function even if I move to
 (for example, if I decide to swith to Debian or Fedora). You could also use [Podman](https://podman.io/)
 if you'd like for this step.
 
-> ***NOTE:*** The below settings have a user and password set with `${USER}` and `${PASSWORD}` respectively.
+> **_NOTE:_** The below settings have a user and password set with `${USER}` and `${PASSWORD}` respectively.
 > This is not an environment variable. You need to modify these snippets yourself in order to set it up how you want it.
 
 #### SSH Setup (borg and rsync)
@@ -257,7 +257,7 @@ will have access to. It's important to note that this file can only contain a si
 disables data deletion until the `BORG_ADMIN` runs a prune operation. Here's the compose file:
 
 ```yml
-version: '3.8'
+version: "3.8"
 services:
   server:
     image: nold360/borgserver:bookworm
@@ -289,7 +289,7 @@ alpine versions. I then utilize a custom samba config for setting Time Machine s
 configuration provided by the image. Here's the compose file:
 
 ```yml
-version: '3.8'
+version: "3.8"
 services:
   server:
     image: ghcr.io/vremenar/samba:latest
@@ -368,6 +368,27 @@ mkdir -p macos/timemachine/${USER}
 # the correct uid/gid to use.
 chown -R 100:101 macos/timemachine/${USER}
 ```
+
+Windows can also make use of our zfs snapshots if we setup the `shadow_copy2` vfs objects option on our windows mount.
+This would look something like this:
+
+```text
+[windows-shared]
+   path = /windows/shared
+   browsable = yes
+   read only = no
+   guest ok = no
+   veto files = /.apdisk/.DS_Store/.TemporaryItems/.Trashes/desktop.ini/ehthumbs.db/Network Trash Folder/Temporary Items/Thumbs.db/
+   delete veto files = yes
+   vfs objects = shadow_copy2
+   shadow:snapdir = ../.zfs/snapshot
+   shadow:sort = desc
+   shadow:format = %Y-%m-%dT%H:%M:%S-%Z
+```
+
+This makes use of zfs' `../.zfs/snapshot` directory in our dataset. However, the path we are using has to be a snapshottable dataset
+in order for this directory to exist. You can utilize `shadow:snapdirseverywhere = yes` to includes snapshots from parent directories.
+Just ensure to set `shadow:crossmountpoints` according to your setup (in my case `no` should be sufficient).
 
 ## Replication Setup
 
@@ -483,7 +504,7 @@ total estimated size is 273K
 receiving incremental stream of backup/samba@next into backup/samba@next
 cannot receive incremental stream: destination backup/samba has been modified
 since most recent snapshot
-86.8KiB 0:00:00 [ 164KiB/s] [<=>                                             ]                                          
+86.8KiB 0:00:00 [ 164KiB/s] [<=>                                             ]
 ```
 
 You need to reset the state of the receiving pool to the snapshot that was previously sent.
@@ -605,7 +626,7 @@ esac
 Put this script somewhere owned by `root` but accessible to other users (and executable). I chose `/opt/backup/ssh.sh`. The directory
 and file have permissions `0755` set on it.
 
-> ***NOTE:*** Use these scripts at your own risk. I have not configured them to handle every possible corner case.
+> **_NOTE:_** Use these scripts at your own risk. I have not configured them to handle every possible corner case.
 
 We can test that our script is working properly by querying for the latest snapshot:
 
@@ -651,7 +672,7 @@ for DATASET in samba; do
 
   # Get the latest snapshot on the remote side
   LATEST_SNAPSHOT="$(ssh -i "/root/.ssh/id_ed25519_zfsbackup" zfsbackup@backup1 latest)"
-  
+
   # Send incremental snapshot between the latest on the remote and the one we just took
   echo "Sending incremental snapshots between ${LATEST_SNAPSHOT} backup/${DATASET}@${SNAPSHOT_NAME}"
   zfs send -RwI "${LATEST_SNAPSHOT}" "backup/${DATASET}@${SNAPSHOT_NAME}" | pv | ssh -i "/root/.ssh/id_ed25519_zfsbackup" zfsbackup@backup1 recv
@@ -753,7 +774,6 @@ Here are some graphs from Grafana:
 
 I utilize [ZeroTier](https://www.zerotier.com/) to maintain a secure network for my devices to communicate on. You can use any method you may choose.
 
-
 ## Acknowledgements
 
 There are tools available that can help with setting up syncing and replicating ZFS datasets.
@@ -766,4 +786,4 @@ It's also important to note that ZFS native encryption is plagued by some pretty
 but you should [consult the evidence](https://github.com/openzfs/zfs/issues?q=is%3Aopen+is%3Aissue+label%3A%22Component%3A+Encryption%22)
 that's out there when making your decision on what method you want to use.
 
-If you have any questions or comments, feel free to shoot me an [email](mailto:me@antoniomika.me) or message me on [IRC](https://web.libera.chat/#pico.sh). 
+If you have any questions or comments, feel free to shoot me an [email](mailto:me@antoniomika.me) or message me on [IRC](https://web.libera.chat/#pico.sh).
