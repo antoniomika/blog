@@ -2,8 +2,8 @@
 description: A personal blog and note taking site
 layout: aside
 nav:
-  - Website: https://antonio.cx
-  - "me@antoniomika.me": mailto:me@antoniomika.me
+  - Website: https://antoniomika.me
+  - "inquiries@mik.qa": mailto:inquiries@mik.qa
   - GitHub: https://github.com/antoniomika
 ---
 
