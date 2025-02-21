@@ -7,7 +7,7 @@ nav:
   - GitHub: https://github.com/antoniomika
 ---
 
-![icon pic](/icon)
+![icon pic](/icon.jpg)
 
 Engineer/Researcher
 <br />
