@@ -14,7 +14,9 @@ date: "2026-11-13"
 
 I use agents heavily these days as part of my toolchain. I usually have a few going at once: Claude Code working in one repo, Codex reviewing a branch in another, and something long-running in the background. I often have them review each other's work too. None of them run on my laptop. They run on VMs I can throw away, and my laptop keeps the stuff I care about: my SSH keys, my 1Password vault, and the `gh` and cloud CLIs that are logged in as me.
 
-This works great until an agent needs one of those things. In this post I'll go over how I run agents in parallel with [herdr](https://github.com/herdrdev/herdr) and [Ovis](https://ovis.sh), and the tool I wrote to deal with credentials, [lend](https://lend.antonio.cx).
+I run those agents on [picd](https://cd.pico.sh), our hosting service at [pico.sh](https://pico.sh). It gives me my own VM with a Docker engine and a shell over SSH. I run herdr and the agents there, and my home directory persists across restarts so my dotfiles and tools stay in place.
+
+This works great until an agent needs something on my laptop. In this post I'll go over how I run agents in parallel with [herdr](https://github.com/herdrdev/herdr) and [Ovis](https://ovis.sh), and the tool I wrote to deal with credentials, [lend](https://lend.antonio.cx).
 
 ## herdr
 
