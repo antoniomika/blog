@@ -8,6 +8,8 @@ toc: true
 date: "2026-11-13"
 ---
 
+> I built [lend](https://github.com/antoniomika/lend) to let remote agents use tools on my laptop with my approval. Here's how it fits into my workflow.
+
 ## Background
 
 I use agents heavily these days as part of my toolchain. I usually have a few going at once: Claude Code working in one repo, Codex reviewing a branch in another, and something long-running in the background. I often have them review each other's work too. None of them run on my laptop. They run on VMs I can throw away, and my laptop keeps the stuff I care about: my SSH keys, my 1Password vault, and the `gh` and cloud CLIs that are logged in as me.
